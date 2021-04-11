@@ -1,5 +1,4 @@
 import axios from 'axios';
-import global from './global'
 
 
 const state = {
@@ -10,7 +9,7 @@ const getters = {};
 const actions = {
 
     getUsers({commit}){
-        axios.get(global.api + '/api/user/users')
+        axios.get('/ingsofuno/public/api/user/users')
         .then ( response => {
             commit('SET_LISTUSERS', response.data.users)
         });

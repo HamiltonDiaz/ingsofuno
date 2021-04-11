@@ -1,10 +1,9 @@
 import axios from 'axios';
-import global from './global'
+
 
 
 const state = {
-    user: {},
-    users:{},
+    user: {},    
     permissions: {},
     msg: 'BIENVENIDO AL DASHBOARD!', 
     message: ''
@@ -14,7 +13,7 @@ const getters = {};
 const actions = {
     
     loginUsr({commit},user){
-        axios.post(global.api + '/api/user/login',{
+        axios.post('/ingsofuno/public/api/user/login',{
             email: user.email,
             password:user.password
         }).then(response=>{
@@ -34,14 +33,14 @@ const actions = {
     },
 
     getCurrent({commit}){
-        axios.get(global.api + 'api/v1/user/currents')
+        axios.get('api/v1/user/currents')
         .then ( response => {
             commit('SET_USER', response.data)
         });
     },
 
     getPermission({commit}){
-        axios.get(global.api + 'api/v1/user/permissions')
+        axios.get('api/v1/user/permissions')
         .then ( response => {
             commit('SET_PERMISSIONS', response.data.permissions)
         });
