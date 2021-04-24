@@ -50,18 +50,18 @@
         </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app color="#15638A" dark>
+    <v-app-bar app class="teal darken-4" dark>
         <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
         <v-spacer />
     </v-app-bar>
 
     <v-main>
-        <v-container>
+        <v-container>            
             <router-view></router-view>
         </v-container>
     </v-main>
     
-    <v-footer app color="#15638A" dark>
+    <v-footer app class="teal darken-4" dark>
         <span class="white--text">HDeveloper - &copy; 2021</span>
     </v-footer>
     
@@ -71,6 +71,8 @@
 
 <script>
 import {mapState} from 'vuex'
+import axios from 'axios'
+
 export default {
     props: {
         source: String,
@@ -82,6 +84,12 @@ export default {
         drawer: true,
         model: false,
     }),
+
+    computed:{
+        //estas propiedaes se disparan en tiempo real
+        ...mapState('users',['currenteUser']),
+    },
+
      methods: {
         //aqui se llaman los modulos que se exportan en el store/index.js
         logout() {
@@ -91,8 +99,10 @@ export default {
     },
     created(){
         //este se ejecuta mucho antes de cargar el componente
-        if(localStorage.hasOwnProperty('blog_token')){
-            
+        if(localStorage.hasOwnProperty('blog_token')){            
+            axios.defaults.headers.common['Authorization']='Bearer ' + localStorage.getItem('blog_token')
+            this.token=localStorage.getItem('blog_token')
+            this.$store.dispatch('users/getCurrent');
         }else{
             window.location.replace('login')
         }

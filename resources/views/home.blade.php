@@ -12,6 +12,11 @@
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="shortcut icon" href="https://sivicovidneiva.gov.co/img/escudo.png">
+    <script>
+        if(!localStorage.hasOwnProperty('blog_token')){
+            window.location.replace('login')
+        }
+    </script>
 </head>
 <body>
     <div id="app">

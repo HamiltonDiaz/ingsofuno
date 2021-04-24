@@ -11,7 +11,10 @@ use Auth;
 class UserController extends Controller
 {
     public function current(){
-        return Auth::user();
+        $user = Auth::user();
+        return [
+            "user"=> $user,
+        ];
     }
 
     public function index(){
@@ -19,6 +22,17 @@ class UserController extends Controller
         return [
             'users'=>$users
         ];
+    }
+
+    public function store(Request $request ){
+        
+        $user= new User();
+        $user->name= $request->name;
+        $user->email= $request->email;
+        $user->password= \Hash::make($request->password);
+        $user->save();
+
+        return response()->json(['user'=>$user]);
     }
 
 }
