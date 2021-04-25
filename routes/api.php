@@ -12,6 +12,7 @@ Route::prefix('/user')->group( function(){
     Route::middleware('auth:api')->get('/current','api\v1\UserController@current');
     Route::middleware('auth:api')->get('/users','api\v1\UserController@index');
     Route::middleware('auth:api')->post('store','api\v1\UserController@store');
+    Route::middleware('auth:api')->put('update','api\v1\UserController@update');
 });
 
 

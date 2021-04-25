@@ -5,22 +5,23 @@
             <v-row align="center" justify="center">
                 <v-col cols="12" sm="8" md="4">
                     <v-card class="elevation-12">
-                        <v-toolbar color="primary" dark flat>
+                        <v-toolbar class="teal darken-4" dark>
                             <v-toolbar-title>Formulario de Acceso</v-toolbar-title>
                             <v-spacer />
                         </v-toolbar>
                         <v-card-text>
                             <v-form>
-                                <!-- v-model: es como el value en html -->                                
-                               <v-text-field label="Email" name="Email" prepend-icon="mdi-email" type="text" v-model="user.email" /> <!-- Todo lo que escriba aqui se va almacenar en la data email -->
+                                <!-- v-model: es como el value en html -->
+                                <v-text-field label="Email" name="Email" prepend-icon="mdi-email" type="text" v-model="user.email" /> <!-- Todo lo que escriba aqui se va almacenar en la data email -->
                                 <v-text-field id="password" label="Password" name="password" prepend-icon="mdi-key" type="password" v-model="user.password" /> <!-- Todo lo que escriba aqui se va almacenar en la data password -->
                                 <div class="text-error">{{message}}</div>
+                                <div class="text-error" v-for="(error, index) in errorLogin" :key="index" v-text="error" > </div>
                             </v-form>
                         </v-card-text>
                         <!-- <pre>{{user}} </pre> -->
                         <v-card-actions>
                             <v-spacer />
-                            <v-btn color="primary" @click="login">Ingresar</v-btn>
+                            <v-btn class="teal darken-4" dark @click="login">Ingresar</v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-col>
@@ -31,7 +32,9 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {
+    mapState
+} from 'vuex'
 
 export default {
     // props: {
@@ -47,7 +50,7 @@ export default {
 
     computed: {
         //esto esa para llamar lo que ya está almacenada en el store
-        ...mapState('login', ['message']),
+        ...mapState('login', ['message', 'errorLogin']),
     },
 
     methods: {
