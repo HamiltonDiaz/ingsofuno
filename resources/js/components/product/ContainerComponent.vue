@@ -4,7 +4,7 @@
     <v-container>
     <v-item-group multiple>
         <v-row>
-            <v-col v-for="product in products" :key="product.id" cols="12" sm="4" md="2">
+            <v-col v-for="product in listProducts" :key="product.id" cols="12" sm="4" md="2">
                 <v-card class="mx-auto" max-width="350" max-height="360">
                     <v-img width="120px" class="mx-auto"  height="130px" :src="product.img">
                     </v-img>
@@ -18,10 +18,10 @@
                     </v-card-text>
 
                     <v-card-actions style="justify-content: center !important;" >
-                        <v-btn color="primary" dark text  @click="openModal('update')">
+                        <v-btn color="primary" dark text  @click="openModal('update', product)">
                             Editar
                         </v-btn>
-                        <v-btn color="warning" dark text @click="openModal('update')">
+                        <v-btn color="warning" dark text @click="openModal('activate', product)">
                             Inactivar
                         </v-btn>
                     </v-card-actions>
@@ -46,31 +46,30 @@
             <v-container>
                 <v-row class="mx-2">
                     <v-col cols="12" md="4">
-                        <v-text-field label="Nombre" v-model="user.name"></v-text-field>
+                        <v-text-field label="Nombre" v-model="product.nombre"></v-text-field>
                     </v-col>
                     <v-col cols="12" md="4">
-                        <v-text-field label="Email" v-model="user.email"></v-text-field>
+                        <v-text-field label="Precio Actual" v-model="product.precio_actual"></v-text-field>
                     </v-col>
-                    <template v-if="actionType==1">
-                        <v-col cols="12" md="4">
-                            <v-text-field label="Password" v-model="user.password" :type="false ? 'text' : 'password'"></v-text-field>
-                        </v-col>
-                    </template>
-                    <template v-else-if="actionType==2">
-                        <v-col cols="12" md="4">
-                            <v-select item-text="description" item-value="id" :items="listOptions" v-model="checkPassword" label="¿Desea cambiar contraseña?">
-                            </v-select>
-                        </v-col>
 
-                        <v-col cols="12" md="4" v-if="checkPassword==1">
-                            <v-text-field label="New Password" v-model="user.password" :type="false ? 'text' : 'password'"></v-text-field>
-                        </v-col>
-                    </template>
-
+                    <v-col cols="12" md="4">
+                        <v-text-field label="Precio Anterior" v-model="product.precio_anterior"></v-text-field>
+                    </v-col>
+                    <v-col cols="4" md="4">
+                        <v-text-field label="Cantidad" v-model="product.cantidad"></v-text-field>
+                    </v-col>
+                    <v-col cols="8" md="8">
+                        <v-text-field label="imagen" v-model="product.img"></v-text-field>
+                    </v-col>
+                    <v-col cols="4" md="4">                    
+                        <v-img width="120px" class="mx-auto"  height="130px" :src="product.img"></v-img>
+                    </v-col>
+                    <v-col cols="8" md="8">                    
+                        <div style="width: 90%; justify-content: center; margin: auto; color: red" v-for="(item, id) in errorMessage" :key="id">
+                            <h6 class="text-center">{{item}}</h6>
+                        </div>                        
+                    </v-col>
                 </v-row>
-                <div style="width: 90%; justify-content: center; margin: auto; color: red" v-for="(item, id) in errorMessage" :key="id">
-                    <h6 class="text-center">{{item}}</h6>
-                </div>
                 <div class="text-error">{{message}}</div>
             </v-container>
 
@@ -81,7 +80,7 @@
                 <v-btn color="primary" text @click="save()" v-if="actionType==1">
                     Guardar
                 </v-btn>
-                <v-btn color="primary" text @click="update()" v-if="actionType==2">
+                <v-btn color="primary" text @click="update()" v-if="actionType!=1">
                     Actualizar
                 </v-btn>
             </v-card-actions>
@@ -105,12 +104,22 @@ export default {
             title: '',
             dialog: false,
             errorMessage: [],
-            errorUser: 0,
+            errorProduct: 0,
             user: {
                 id: 0,
                 name: '',
                 email: '',
                 password: ''
+            },
+            product:{
+                id:0,
+                nombre:"",
+                img:"",
+                precio_actual:0,
+                precio_anterior:0,
+                cantidad:0,
+                active:0,
+                eliminado:0,
             },
             listOptions: [{
                     id: 1,
@@ -127,7 +136,7 @@ export default {
 
     computed: {
         //esto esa para poder traer las variables del storee que devuelve la petición /store/modules/products
-        ...mapState('products', ['products', 'message'])
+        ...mapState('products', ['listProducts', 'message', 'dataResponse'])
     },
 
     mounted() {
@@ -138,31 +147,44 @@ export default {
     methods: {
 
         //con esto se traen las aciones de /store/modules/products
-        ...mapActions('users', ['getUsers', 'saveUser', 'updateUser']),
+        ...mapActions('products', ['getProducts', 'saveProduct', 'updateProduct']),
 
         openModal(action, data) {
             switch (action) {
                 case 'insert': {
                     this.actionType = 1
                     this.dialog = true
-                    this.title = "Nuevo Usuario"
+                    this.title = "Crear"
                     this.errorMessage = []
-                    this.errorUser = 0
-                    this.user.name = ""
-                    this.user.email = ""
-                    this.user.password = ""
+                    this.errorProduct = 0
+                    this.product.nombre= ""
+                    this.product.img=""
+                    this.product.precio_actual= ""
+                    this.product.precio_anterior= ""
+                    this.product.cantidad=""                    
                     break;
                 }
                 case 'update': {
                     this.actionType = 2
                     this.dialog = true
-                    this.title = "Editar Usuario"
+                    this.title = "Editar"
                     this.errorMessage = []
-                    this.errorUser = 0
-                    this.user.name = data.name
-                    this.user.email = data.email
-                    this.user.password = data.password
-                    this.user.id = data.id
+                    this.errorProduct = 0
+                    this.product.nombre= data.nombre
+                    this.product.img= data.img
+                    this.product.precio_actual= data.precio_actual
+                    this.product.precio_anterior= data.precio_anterior
+                    this.product.cantidad= data.cantidad                    
+                    break;
+                }
+                case 'activate': {
+                    this.actionType = 3
+                    this.dialog = true
+                    this.title = "Acitivar/Desactivar"
+                    this.errorMessage = []
+                    this.errorProduct = 0
+                    this.product.active= data.active
+                    this.product.eliminado= data.eliminado
                     break;
                 }
             }
@@ -170,32 +192,35 @@ export default {
 
         validate() {
             this.errorMessage = []
-            this.errorUser = 0
+            this.errorProduct = 0
 
-            if (this.actionType == 1 || this.checkPassword == 1) {
-                if (!this.user.password) {
-                    this.errorMessage.push("Digite password de usuario")
-                }
+            if (!this.product.nombre) {
+                this.errorMessage.push("Digite el nombre del producto")
             }
-            if (!this.user.name) {
-                this.errorMessage.push("Digite nombre de usuario")
+            if (!this.product.img) {
+                this.errorMessage.push("Escriba URL de la imagen")
             }
-            if (!this.user.email) {
-                this.errorMessage.push("Digite email de usuario")
+
+            if (!this.product.precio_actual) {
+                this.errorMessage.push("Digite precio actual")
             }
+            if (!this.product.precio_anterior) {
+                this.errorMessage.push("Escriba Precio Anterior")
+            }
+
             if (this.errorMessage.length) {
-                this.errorUser = 1
+                this.errorProduct = 1
             }
-            return this.errorUser
-
+            return this.errorProduct
         },
+
         save() {
             if (this.validate()) {
                 return
             }
 
             this.errorMessage = [];
-            this.saveUser(this.user)
+            this.saveProduct(this.product)
                 .then(() => {
                     this.dialog = false
                     this.getUsers()
