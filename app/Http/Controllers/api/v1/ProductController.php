@@ -31,5 +31,24 @@ class ProductController extends Controller
         return response()->json(['product'=>$product],200);
     }
 
+    
+    public function update(Request $request ){
+
+        //dd($request->all());
+        $product= Product::findOrFail($request->id);
+
+        if($request->nombre) {
+            $product->nombre=$request->nombre;
+            $product->img=$request->img;
+            $product->precio_actual=$request->precio_actual;
+            $product->precio_anterior=$request->precio_anterior;
+            $product->cantidad=$request->cantidad;
+        }else{
+            $product->active=$request->active;
+        }
+        $product->save();
+        return response()->json(['product'=>$product,'message'=>"Actualizado"],200);
+    }
+
  
 }

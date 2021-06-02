@@ -2,36 +2,48 @@
 <div>
 
     <v-container>
-    <v-item-group multiple>
-        <v-row>
-            <v-col v-for="product in listProducts" :key="product.id" cols="12" sm="4" md="2">
-                <v-card class="mx-auto" max-width="350" max-height="360">
-                    <v-img width="120px" class="mx-auto"  height="130px" :src="product.img">
-                    </v-img>
+        <div style="color: green; ">{{message}}</div>
+        <v-item-group multiple>
+            <v-row>
+                <v-col v-for="product in listProducts" :key="product.id" cols="12" sm="4" md="2">
+                    <v-card class="mx-auto" max-width="350" max-height="360">
+                        <v-img width="120px" class="mx-auto" height="130px" :src="product.img">
+                        </v-img>
 
-                    <v-card-subtitle class="pb-0 " style="height: 50px; font-size: 12px; overflow: hidden; padding: 5px 15px; color: #006064; font-weight: bold;">
-                        {{product.nombre}}
-                    </v-card-subtitle>
-                    
-                    <v-card-text style="color: #E91E63; font-weight: bold;">
-                        <div>${{product.precio_actual}}</div>
-                    </v-card-text>
+                        <v-card-subtitle class="pb-0 " style="height: 50px; font-size: 12px; overflow: hidden; padding: 5px 15px; color: #006064; font-weight: bold;">
+                            {{product.nombre}}
+                        </v-card-subtitle>
+                        <v-row class="mx-2 py-0 my-0">
+                            <v-col cols="12" md="6">
+                                <div style="color: #E91E63;" >${{product.precio_actual}}</div>                                
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <div style="color: black; text-decoration:line-through; ">${{product.precio_anterior}}</div>                                
+                            </v-col>
+                            <v-col cols="12" md="12">
+                                    <div>Cantidad: {{product.cantidad}}</div>
+                            </v-col>
+                        </v-row>
 
-                    <v-card-actions style="justify-content: center !important;" >
-                        <v-btn color="primary" dark text  @click="openModal('update', product)">
-                            Editar
-                        </v-btn>
-                        <v-btn color="warning" dark text @click="openModal('activate', product)">
-                            Inactivar
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-col>
-        </v-row>
-    </v-item-group>
-        </v-container>
+                        <v-card-actions style="justify-content: center !important;">
+                            <v-btn color="primary" dark text @click="openModal('update', product)">
+                                Editar
+                            </v-btn>
+                            <v-btn color="#E53935" text @click="inactivar(product)" v-if="product.active==1" >
+                                Inactivar
+                            </v-btn>
+                            <v-btn color="success" dark text @click="inactivar(product)" v-if="product.active==0" >
+                                Activar
+                            </v-btn>
+                              
+                        </v-card-actions>
+                    </v-card>
+                </v-col>
+            </v-row>
+        </v-item-group>       
+        
+    </v-container>
 
-    
     <v-btn color="green" bottom dark fab fixed right @click="openModal('insert')">
         <v-icon>mdi-plus</v-icon>
     </v-btn>
@@ -61,16 +73,16 @@
                     <v-col cols="8" md="8">
                         <v-text-field label="imagen" v-model="product.img"></v-text-field>
                     </v-col>
-                    <v-col cols="4" md="4">                    
-                        <v-img width="120px" class="mx-auto"  height="130px" :src="product.img"></v-img>
+                    <v-col cols="4" md="4">
+                        <v-img width="120px" class="mx-auto" height="130px" :src="product.img"></v-img>
                     </v-col>
-                    <v-col cols="8" md="8">                    
+                    <v-col cols="8" md="8">
                         <div style="width: 90%; justify-content: center; margin: auto; color: red" v-for="(item, id) in errorMessage" :key="id">
                             <h6 class="text-center">{{item}}</h6>
-                        </div>                        
+                        </div>
                     </v-col>
                 </v-row>
-                <div class="text-error">{{message}}</div>
+                
             </v-container>
 
             <v-divider></v-divider>
@@ -80,9 +92,9 @@
                 <v-btn color="primary" text @click="save()" v-if="actionType==1">
                     Guardar
                 </v-btn>
-                <v-btn color="primary" text @click="update()" v-if="actionType!=1">
+                <v-btn color="primary" text @click="update()" v-if="actionType==2">
                     Actualizar
-                </v-btn>
+                </v-btn>           
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -105,21 +117,15 @@ export default {
             dialog: false,
             errorMessage: [],
             errorProduct: 0,
-            user: {
+            product: {
                 id: 0,
-                name: '',
-                email: '',
-                password: ''
-            },
-            product:{
-                id:0,
-                nombre:"",
-                img:"",
-                precio_actual:0,
-                precio_anterior:0,
-                cantidad:0,
-                active:0,
-                eliminado:0,
+                nombre: "",
+                img: "",
+                precio_actual: 0,
+                precio_anterior: 0,
+                cantidad: 0,
+                active: 1,
+                eliminado: 0,
             },
             listOptions: [{
                     id: 1,
@@ -157,11 +163,11 @@ export default {
                     this.title = "Crear"
                     this.errorMessage = []
                     this.errorProduct = 0
-                    this.product.nombre= ""
-                    this.product.img=""
-                    this.product.precio_actual= ""
-                    this.product.precio_anterior= ""
-                    this.product.cantidad=""                    
+                    this.product.nombre = ""
+                    this.product.img = ""
+                    this.product.precio_actual = ""
+                    this.product.precio_anterior = ""
+                    this.product.cantidad = ""
                     break;
                 }
                 case 'update': {
@@ -170,46 +176,50 @@ export default {
                     this.title = "Editar"
                     this.errorMessage = []
                     this.errorProduct = 0
-                    this.product.nombre= data.nombre
-                    this.product.img= data.img
-                    this.product.precio_actual= data.precio_actual
-                    this.product.precio_anterior= data.precio_anterior
-                    this.product.cantidad= data.cantidad                    
-                    break;
-                }
-                case 'activate': {
-                    this.actionType = 3
-                    this.dialog = true
-                    this.title = "Acitivar/Desactivar"
-                    this.errorMessage = []
-                    this.errorProduct = 0
-                    this.product.active= data.active
-                    this.product.eliminado= data.eliminado
+                    this.product.id = data.id
+                    this.product.nombre = data.nombre
+                    this.product.img = data.img
+                    this.product.precio_actual = data.precio_actual
+                    this.product.precio_anterior = data.precio_anterior
+                    this.product.cantidad = data.cantidad
                     break;
                 }
             }
+        },
+
+        inactivar(data){
+            this.actionType = 3            
+            this.product.id = data.id
+            this.product.active = data.active==1 ? 0 : 1
+            this.update(this.product)
+        },
+
+        closeModal() {
+            this.dialog = falase
         },
 
         validate() {
             this.errorMessage = []
             this.errorProduct = 0
 
-            if (!this.product.nombre) {
-                this.errorMessage.push("Digite el nombre del producto")
-            }
-            if (!this.product.img) {
-                this.errorMessage.push("Escriba URL de la imagen")
-            }
+            if (this.actionType != 3) {
+                if (!this.product.nombre) {
+                    this.errorMessage.push("Digite el nombre del producto")
+                }
+                if (!this.product.img) {
+                    this.errorMessage.push("Escriba URL de la imagen")
+                }
 
-            if (!this.product.precio_actual) {
-                this.errorMessage.push("Digite precio actual")
-            }
-            if (!this.product.precio_anterior) {
-                this.errorMessage.push("Escriba Precio Anterior")
-            }
+                if (!this.product.precio_actual) {
+                    this.errorMessage.push("Digite precio actual")
+                }
+                if (!this.product.precio_anterior) {
+                    this.errorMessage.push("Escriba Precio Anterior")
+                }
 
-            if (this.errorMessage.length) {
-                this.errorProduct = 1
+                if (this.errorMessage.length) {
+                    this.errorProduct = 1
+                }
             }
             return this.errorProduct
         },
@@ -223,7 +233,7 @@ export default {
             this.saveProduct(this.product)
                 .then(() => {
                     this.dialog = false
-                    this.getUsers()
+                    this.getProducts()
                 }).catch((e) => {
                     this.errorMessage = e.response.data.errors;
                 })
@@ -232,9 +242,9 @@ export default {
             if (this.validate()) {
                 return
             }
-            this.updateUser(this.user)
+            this.updateProduct(this.product)
                 .then(() => {
-                    this.getUsers()
+                    this.getProducts()
                     this.dialog = false
                 }).catch((e) => {
                     this.errorMessage = e.response.data.errors;

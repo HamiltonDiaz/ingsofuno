@@ -5,8 +5,6 @@ const state = {
     dataResponse: {},
     listProducts:[],
     message: '',
-    
-
 };
 
 const getters = {};
@@ -27,14 +25,14 @@ const actions = {
             cantidad: product.cantidad,
             active: product.active,
             eliminado: product.eliminado,
-        })
+        })        
         commit('SET_DATA',response.data.product)
     },
 
-    async updateProduct({commit}, user){        
-        console.log(user)
+    async updateProduct({commit}, product){        
         const response = await axios.put("/products/update",
         {
+            id: product.id,
             nombre: product.nombre,
             img: product.img,
             precio_actual: product.precio_actual,
@@ -44,6 +42,7 @@ const actions = {
             eliminado: product.eliminado,
         })
         commit('SET_DATA',response.data.product)
+        commit('SET_MESSAGE',response.data.message)
         
     }
 
@@ -59,6 +58,11 @@ const mutations = {
     SET_DATA(state, data){
         state.dataResponse = data;
     },
+    
+    SET_MESSAGE(state, data){
+        state.message = data;
+    },
+    
     
 };
 

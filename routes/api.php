@@ -17,9 +17,9 @@ Route::prefix('/user')->group( function(){
 
 
 
-Route::prefix('/products')->group( function(){
-    /* Route::middleware('auth:api')->get('/','api\v1\ProductController@index');     */
+Route::prefix('/products')->group( function(){    
     Route::middleware('auth:api')->get('/','api\v1\ProductController@index');    
-    Route::middleware('auth:api')->post('store','api\v1\ProductController@store');
+    Route::middleware('auth:api')->post('store','api\v1\ProductController@store');    
+    Route::middleware('auth:api')->put('update','api\v1\ProductController@update');
 
 });
